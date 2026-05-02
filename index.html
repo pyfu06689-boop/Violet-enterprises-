@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BJF Pattambi | Official Digital Menu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bjf-red: #D90429;
+            --bjf-white: #FFFFFF;
+            --bjf-light-gray: #F8F9FA;
+            --bjf-text: #2B2D42;
+            --shadow-premium: 0 15px 35px rgba(0,0,0,0.08);
+            --glow-red: 0 0 20px rgba(217, 4, 41, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bjf-light-gray); color: var(--bjf-text); overflow-x: hidden; scroll-behavior: smooth; }
+
+        /* === LANDING SCREEN === */
+        #landing {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: var(--bjf-white); z-index: 2000; transition: 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #landing.fade { opacity: 0; pointer-events: none; transform: translateY(-30px); }
+        .logo-ring {
+            width: 110px; height: 110px; border: 5px solid var(--bjf-red);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 25px; animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(217, 4, 41, 0.6); } 70% { box-shadow: 0 0 0 25px rgba(217, 4, 41, 0); } 100% { box-shadow: 0 0 0 0 rgba(217, 4, 41, 0); } }
+        
+        .start-btn {
+            background: var(--bjf-red); color: white; border: none;
+            padding: 18px 55px; border-radius: 50px; font-weight: 800;
+            letter-spacing: 1.5px; box-shadow: 0 10px 25px rgba(217, 4, 41, 0.4);
+        }
+
+        /* === MENU APP === */
+        #menu-app { display: none; padding-bottom: 150px; }
+        
+        /* FIXED TOP ORDER SUMMARY */
+        #order-summary {
+            background: white; border-bottom: 4px solid var(--bjf-red);
+            padding: 20px 16px; position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05); display: none;
+        }
+        .order-title { font-size: 1rem; font-weight: 800; color: var(--bjf-red); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+
+        header { padding: 45px 20px 20px; text-align: center; }
+        header h1 { font-weight: 800; font-size: 1.9rem; color: var(--bjf-text); }
+        header h1 span { color: var(--bjf-red); }
+        header p { opacity: 0.5; font-size: 0.8rem; margin-top: 5px; font-weight: 600; }
+
+        .container { padding: 0 16px; }
+        .section-header {
+            font-size: 1.3rem; font-weight: 800; margin: 45px 0 20px;
+            color: var(--bjf-red); display: flex; align-items: center; gap: 10px;
+            text-transform: uppercase;
+        }
+        .section-header::after { content: ''; flex: 1; height: 2px; background: #eee; }
+
+        /* GRID SYSTEM */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .item-card {
+            background: white; border-radius: 22px; padding: 12px;
+            transition: all 0.3s ease; border: 1px solid #f0f0f0;
+            box-shadow: var(--shadow-premium); overflow: hidden;
+            position: relative;
+        }
+
+        /* STABLE GLOW (NO WOBBLE) */
+        .item-card.active-touch {
+            box-shadow: var(--glow-red);
+            border-color: var(--bjf-red);
+            transform: translateY(-2px);
+        }
+
+        .item-card img { width: 100%; height: 110px; object-fit: cover; border-radius: 15px; margin-bottom: 10px; }
+        .item-card h3 { font-size: 0.9rem; font-weight: 600; line-height: 1.2; height: 2.4em; overflow: hidden; margin-bottom: 5px; }
+        .item-card .price { font-size: 1.1rem; font-weight: 800; color: var(--bjf-red); }
+
+        /* QTY SELECTOR POPUP-STYLE */
+        .qty-controls {
+            display: none; flex-direction: column; gap: 10px; margin-top: 12px;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .qty-row { display: flex; align-items: center; justify-content: center; gap: 20px; }
+        .qty-btn {
+            width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid var(--bjf-red);
+            background: white; color: var(--bjf-red); font-weight: 800; font-size: 1.2rem;
+        }
+        .add-btn {
+            background: var(--bjf-red); color: white; border: none; width: 100%;
+            padding: 12px; border-radius: 12px; font-weight: 800; font-size: 0.8rem;
+        }
+
+        /* ACTIONS */
+        .actions-bar {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 12px; z-index: 1500; width: 92%; max-width: 480px;
+        }
+        .action-btn {
+            flex: 1; height: 65px; border-radius: 20px; border: none;
+            color: white; font-weight: 800; display: flex;
+            align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+        .btn-call { background: #222; }
+        .btn-waiter { background: var(--bjf-red); }
+
+        .selected-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fffafa; padding: 12px 15px; border-radius: 12px;
+            margin-bottom: 8px; border: 1px solid rgba(217, 4, 41, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="landing">
+        <div class="logo-ring">
+            <span style="font-weight:800; font-size: 1.4rem; color: var(--bjf-red);">BJF</span>
+        </div>
+        <h1 style="margin-bottom: 30px; font-weight: 400;">Juicy <b style="color: var(--bjf-red); font-weight: 800;">Pattambi</b></h1>
+        <button class="start-btn" onclick="initApp()">VIEW MENU</button>
+    </div>
+
+    <div id="menu-app">
+        <div id="order-summary">
+            <div class="order-title">🛒 Your Order Summary</div>
+            <div id="order-list"></div>
+        </div>
+
+        <header>
+            <h1>Bangalore <span>Juicy & Foods</span></h1>
+            <p>PATTAMBI | +91 8592967503</p>
+        </header>
+
+        <div class="container" id="menu-target"></div>
+    </div>
+
+    <div class="actions-bar" id="actionBars" style="display:none;">
+        <button class="action-btn btn-call" onclick="window.location.href='tel:+918592967503'">
+            📞 CALL SHOP
+        </button>
+        <button class="action-btn btn-waiter" onclick="triggerLoudBell()">
+            🔔 WAITER
+        </button>
+    </div>
+
+    <script>
+        const MENU_DATA = {
+            "Lime": { img: "https://images.pexels.com/photos/1194030/pexels-photo-1194030.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Lime:20", "Mint Lime:30", "Ginger Lime:30", "Orange Lime:40", "Pineapple Lime:40", "Grape Lime:40", "Mango Lime:40", "Tender Lime:40"]},
+            "Kulukki Sharbat": { img: "https://images.pexels.com/photos/1233319/pexels-photo-1233319.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Orange:55", "Pineapple:55", "Mosambi:55", "Boost:55", "Raw Mango:60", "Passion Fruit:60"]},
+            "Health Special": { img: "https://images.pexels.com/photos/2109099/pexels-photo-2109099.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["ABC:90", "ACP:90", "Orange Carrot:90"]},
+            "Fresh Juice": { img: "https://images.pexels.com/photos/1337825/pexels-photo-1337825.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Watermelon Juice:50", "Orange Juice:60", "Mosambi Juice:60", "Pineapple Juice:60", "Grape Juice:60", "Papaya Juice:60", "Shamam Juice:60", "Mango Juice:70", "Carrot Juice:80", "Strawberry Juice:80", "Anar Juice:90"]},
+            "Soda": { img: "https://images.pexels.com/photos/605408/pexels-photo-605408.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Lime Soda:20", "Chilli Soda:30", "Orange Soda:50", "Pineapple Soda:50", "Grape Soda:50", "Passion Fruit Soda:60", "Raw Mango Soda:60", "Blue Lime Soda:60"]},
+            "Milk Shake": { img: "https://images.pexels.com/photos/103566/pexels-photo-103566.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Papaya Shake:60", "Tender Shake:65", "Shamam Shake:70", "Chikoo Shake:70", "Grape Shake:70", "Sharjah (with Ice Cream):80", "Carrot Shake:80", "Apple Shake:80", "Cocktail King:80", "Mango Shake (Season):80", "Strawberry Shake (Season):80", "Anar Shake:90", "Seetha (Season):90", "Butter Shake (Season):90"]},
+            "Lassi": { img: "https://images.pexels.com/photos/6152261/pexels-photo-6152261.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Sweet Lassi:60", "Fruit Lassi:70", "Dryfruit Lassi:90", "Mango Lassi:110", "Tender Lassi:120"]},
+            "Tender Specials": { img: "https://images.pexels.com/photos/4016579/pexels-photo-4016579.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Tender Boost:80", "Tender Khajoor:80", "Tender Chikoo:80", "Tender Cashew:90", "Tender Mango:90", "Tender Strawberry:90", "Tender Fruit:90", "Tender Oreo:90", "Tender Dryfruit:100", "Tender Butter:100", "Tender Seetha:100", "Tender Snickers:110"]},
+            "Dryfruit": { img: "https://images.pexels.com/photos/4137901/pexels-photo-4137901.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Khajoor Shake:60", "Peanut Butter Shake:80", "Badam Shake:80", "Almond Cashew Shake:90", "Dryfruit Shake:90", "Khajoor Cashew:90"]},
+            "Malba": { img: "https://images.pexels.com/photos/5946973/pexels-photo-5946973.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Tender Malba:110", "Chikoo Malba:110", "Apple Malba:110", "Mango Malba:120", "Strawberry Malba:120", "Butter Malba:120"]},
+            "Sundaes & Falooda": { img: "https://images.pexels.com/photos/1362534/pexels-photo-1362534.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Fruit Salad:75", "Tender Fudge:95", "Chocolate Fudge:100", "Royal Falooda:115", "Bombay Falooda:150", "Snickers Falooda:150", "Tender Falooda:160"]},
+            "Chocolates": { img: "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Cold Coffee (with Ice Cream):80", "Cold Boost (with Ice Cream):80", "Choco Pie Shake:80", "Oreo Shake:80", "Chocolate Shake:90", "Kitkat Shake:90", "Belgium Chocolate:90", "Snickers Shake:100", "Brownie Cream Shake:120", "Sizzling Brownie:170"]},
+            "Eats (Snacks)": { img: "https://images.pexels.com/photos/1647163/pexels-photo-1647163.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Samoona Veg:55", "Samoona Egg:55", "Samoona Chicken:65", "Sandwich Veg:75", "Sandwich Egg:85", "Sandwich Chicken:100", "Sweet Corn Sandwich:80", "Juicy Special Mix Sandwich:110"]},
+            "Kolkatha Roll": { img: "https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=400", items: ["Egg Roll:65", "Chicken Roll:90", "Beef Roll:100"]}
+        };
+
+        let audioCtx;
+        let cart = {};
+
+        function initApp() {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            document.getElementById('landing').classList.add('fade');
+            document.getElementById('menu-app').style.display = 'block';
+            document.getElementById('actionBars').style.display = 'flex';
+            renderMenu();
+        }
+
+        function renderMenu() {
+            const target = document.getElementById('menu-target');
+            for (const [cat, data] of Object.entries(MENU_DATA)) {
+                const section = document.createElement('div');
+                section.innerHTML = `<div class="section-header">${cat}</div>`;
+                const grid = document.createElement('div');
+                grid.className = 'grid';
+                
+                data.items.forEach(itemStr => {
+                    const [name, price] = itemStr.split(':');
+                    const id = name.replace(/[^a-zA-Z]/g, '');
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.id = `card-${id}`;
+                    card.innerHTML = `
+                        <img src="${data.img}" alt="${name}">
+                        <h3>${name}</h3>
+                        <div class="price">₹${price}</div>
+                        <div class="qty-controls" id="controls-${id}">
+                            <div class="qty-row">
+                                <button class="qty-btn" onclick="updateQty('${id}', -1, event)">-</button>
+                                <span id="qty-val-${id}" style="font-weight:800;">1</span>
+                                <button class="qty-btn" onclick="updateQty('${id}', 1, event)">+</button>
+                            </div>
+                            <button class="add-btn" onclick="addToCart('${name}', ${price}, '${id}', event)">ADD TO ORDER</button>
+                        </div>
+                    `;
+                    
+                    card.onclick = (e) => {
+                        const ctrls = document.getElementById(`controls-${id}`);
+                        const isVisible = ctrls.style.display === 'flex';
+                        document.querySelectorAll('.qty-controls').forEach(c => c.style.display = 'none');
+                        document.querySelectorAll('.item-card').forEach(c => c.classList.remove('active-touch'));
+                        if(!isVisible) {
+                            ctrls.style.display = 'flex';
+                            card.classList.add('active-touch');
+                        }
+                    };
+                    grid.appendChild(card);
+                });
+                section.appendChild(grid);
+                target.appendChild(section);
+            }
+        }
+
+        function updateQty(id, delta, e) {
+            e.stopPropagation();
+            const span = document.getElementById(`qty-val-${id}`);
+            let val = parseInt(span.innerText) + delta;
+            if(val < 1) val = 1;
+            span.innerText = val;
+        }
+
+        function addToCart(name, price, id, e) {
+            e.stopPropagation();
+            const qty = parseInt(document.getElementById(`qty-val-${id}`).innerText);
+            cart[name] = { qty, price };
+            updateOrderUI();
+            
+            const card = document.getElementById(`card-${id}`);
+            card.style.background = "#fff5f5";
+            document.getElementById(`controls-${id}`).style.display = 'none';
+            card.classList.remove('active-touch');
+        }
+
+        function updateOrderUI() {
+            const summary = document.getElementById('order-summary');
+            const list = document.getElementById('order-list');
+            list.innerHTML = '';
+            let total = 0;
+            
+            Object.keys(cart).forEach(name => {
+                const item = cart[name];
+                total += item.qty * item.price;
+                const div = document.createElement('div');
+                div.className = 'selected-item';
+                div.innerHTML = `<span><b>${item.qty}x</b> ${name}</span><span style="color:var(--bjf-red); font-weight:800">₹${item.qty * item.price}</span>`;
+                list.appendChild(div);
+            });
+
+            if(total > 0) {
+                summary.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function triggerLoudBell() {
+            if (navigator.vibrate) navigator.vibrate([150, 100, 150]);
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const playNote = (freq, time, length, volume) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'triangle'; 
+                osc.frequency.setValueAtTime(freq, time);
+                gain.gain.setValueAtTime(0, time);
+                gain.gain.linearRampToValueAtTime(volume, time + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + length);
+                osc.start(time);
+                osc.stop(time + length);
+            };
+
+            const now = audioCtx.currentTime;
+            playNote(750, now, 1.2, 0.5); 
+            playNote(950, now, 1.2, 0.3); 
+            playNote(600, now + 0.4, 1.5, 0.5); 
+            playNote(1100, now + 0.4, 1.5, 0.1);
+
+            const btn = document.querySelector('.btn-waiter');
+            btn.innerHTML = "✅ CALLED";
+            setTimeout(() => { btn.innerHTML = "🔔 WAITER"; }, 3000);
+        }
+    </script>
+</body>
+</html>
